@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fermentation Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        }
+        #chart-container {
+        width: 90%;
+        max-width: 1200px; /* Set a reasonable maximum width */
+        height: 500px;      /* Explicit height for the canvas */
+        margin: auto;
+        }
+        canvas {
+        width: 100% !important;
+        height: 100% !important;
+        }
+    </style>
+    </head>
+<body>
+  <h1>Fermentation Data Visualizer</h1>
+  <div id="chart-container">
+    <canvas id="fermentationChart"></canvas>
+  </div>
+
+  <script>
+    // Sample API URL (replace this with your actual Lambda Function URL)
+    const apiUrl = "https://sztnzb35kpqbmj7pyy75eds43u0pxpwz.lambda-url.eu-central-1.on.aws/?ID=7944841&hours=6"; 
+
+    // Fetch data from the API
+    async function fetchData() {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    // Process data for the chart
+    function processData(data) {
+      return {
+        labels: data.map(item => item.timestamp), // Timestamps as labels
+        gravity: data.map(item => parseFloat(item.gravity)), // Gravity values
+        temperature: data.map(item => parseFloat(item.temperature)), // Temperature values
+        battery: data.map(item => parseFloat(item.battery)), // Battery values
+        angle: data.map(item => parseFloat(item.angle)) // Angle values
+      };
+    }
+
+    // Render the chart
+    async function renderChart() {
+      const data = await fetchData();
+      if (!data) return;
+
+      const processedData = processData(data);
+
+      const ctx = document.getElementById("fermentationChart").getContext("2d");
+
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: processedData.labels, // X-axis labels
+          datasets: [
+            {
+              label: "Gravity",
+              data: processedData.gravity,
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: "y1"
+            },
+            {
+              label: "Temperature (°C)",
+              data: processedData.temperature,
+              borderColor: "rgba(255, 99, 132, 1)",
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: "y2"
+            },
+            {
+              label: "Battery (V)",
+              data: processedData.battery,
+              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderWidth: 2,
+              tension: 0.3,
+              hidden: true // Hide by default
+            },
+            {
+              label: "Angle",
+              data: processedData.angle,
+              borderColor: "rgba(255, 206, 86, 1)",
+              backgroundColor: "rgba(255, 206, 86, 0.2)",
+              borderWidth: 2,
+              tension: 0.3,
+              hidden: true // Hide by default
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "Timestamp"
+              }
+            },
+            y1: {
+              type: "linear",
+              display: true,
+              position: "left",
+              title: {
+                display: true,
+                text: "Gravity"
+              }
+            },
+            y2: {
+              type: "linear",
+              display: true,
+              position: "right",
+              title: {
+                display: true,
+                text: "Temperature (°C)"
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize the chart
+    renderChart();
+  </script>
+</body>
+</html>

@@ -55,7 +55,7 @@ def lambda_handler(event, context):
 
         # Return data sorted by timestamp
         items = response.get('Items', [])
-        items.sort(key=lambda x: x['timestamp'], reverse=True)
+        items.sort(key=lambda x: x['timestamp'])
 
         # Convert the latest items to the desired format
         formatted_items = []
