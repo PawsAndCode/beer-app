@@ -44,8 +44,8 @@ resource "aws_lambda_function" "query_lambda" {
   function_name = "query"
   s3_bucket     = aws_s3_bucket.lambda_bucket.bucket
   s3_key        = aws_s3_object.query_code.key
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.9" # Match your Lambda's runtime
+  handler       = "query.lambda_handler"
+  runtime       = "python3.10" # Match your Lambda's runtime
   role          = aws_iam_role.lambda_execution_role.arn
   timeout       = 10
   memory_size   = 128
