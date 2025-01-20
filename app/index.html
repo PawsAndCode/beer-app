@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fermentation Data</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        }
-        #chart-container {
-        width: 90%;
-        max-width: 1200px; /* Set a reasonable maximum width */
-        height: 500px;      /* Explicit height for the canvas */
-        margin: auto;
-        }
-        canvas {
-        width: 100% !important;
-        height: 100% !important;
-        }
-    </style>
-    </head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fermentation Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #chart-container {
+      width: 90%;
+      max-width: 1200px; /* Set a reasonable maximum width */
+      height: 500px;      /* Explicit height for the canvas */
+      margin: auto;
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    #data-summary {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
 <body>
   <h1>Fermentation Data Visualizer</h1>
+  <div id="data-summary">
+    <!-- Placeholder for dynamic data summary -->
+    Loading data...
+  </div>
   <div id="chart-container">
     <canvas id="fermentationChart"></canvas>
   </div>
@@ -57,10 +66,30 @@
       };
     }
 
+    // Update the data summary section
+    function updateDataSummary(data) {
+      const dataSummaryDiv = document.getElementById("data-summary");
+      if (!data || data.length === 0) {
+        dataSummaryDiv.textContent = "No data available.";
+        return;
+      }
+
+      const latestTimestamp = data[data.length-1].timestamp;
+      const totalPoints = data.length;
+
+      dataSummaryDiv.innerHTML = `
+        <strong>Data Points:</strong> ${totalPoints} | 
+        <strong>Latest Timestamp:</strong> ${latestTimestamp}
+      `;
+    }
+
     // Render the chart
     async function renderChart() {
       const data = await fetchData();
       if (!data) return;
+
+      // Update data summary
+      updateDataSummary(data);
 
       const processedData = processData(data);
 
@@ -111,6 +140,7 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Allows the chart to stretch within its container
           scales: {
             x: {
               title: {
