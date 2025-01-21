@@ -24,4 +24,4 @@ clean:
 	@echo "Cleaning build directory..."
 	@rm -rf $(BUILD_DIR)
 
-.PHONY: build deploy clean
+.PHONY: build deploy
